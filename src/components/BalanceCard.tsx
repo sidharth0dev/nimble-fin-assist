@@ -1,36 +1,43 @@
-import { TrendingUp, TrendingDown } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+'use client'
+
+import { TrendingUp } from 'lucide-react'
 
 interface BalanceCardProps {
-  balance: number;
-  change: number;
-  changePercentage: number;
+  balance: number
+  change: number
+  changePercent: number
 }
 
-export function BalanceCard({ balance, change, changePercentage }: BalanceCardProps) {
-  const isPositive = change >= 0;
+export default function BalanceCard({ balance, change, changePercent }: BalanceCardProps) {
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(amount)
+  }
+
+  const isPositive = change >= 0
 
   return (
-    <Card className="border-border bg-card">
-      <CardContent className="p-6">
-        <div className="space-y-2">
-          <p className="text-sm text-muted-foreground font-medium">Current Balance</p>
-          <div className="flex items-baseline gap-3">
-            <h2 className="text-4xl font-bold text-foreground">${balance.toLocaleString()}</h2>
-            <div
-              className={`flex items-center gap-1 text-sm font-medium ${
-                isPositive ? "text-success" : "text-destructive"
-              }`}
-            >
-              {isPositive ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
-              <span>{changePercentage}%</span>
-            </div>
+    <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
+      <h2 className="text-lg font-medium text-gray-300 mb-4">Current Balance</h2>
+      
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="text-3xl font-bold text-white mb-2">
+            {formatCurrency(balance)}
           </div>
-          <p className="text-sm text-muted-foreground">
-            {isPositive ? "+" : ""}${Math.abs(change).toLocaleString()} from last month
+          <div className="flex items-center gap-2">
+            <TrendingUp className={`h-4 w-4 ${isPositive ? 'text-green-500' : 'text-red-500'}`} />
+            <span className={`text-sm font-medium ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+              {isPositive ? '+' : ''}{changePercent}%
+            </span>
+          </div>
+          <p className="text-sm text-gray-400 mt-1">
+            {isPositive ? '+' : ''}{formatCurrency(change)} from last month
           </p>
         </div>
-      </CardContent>
-    </Card>
-  );
+      </div>
+    </div>
+  )
 }

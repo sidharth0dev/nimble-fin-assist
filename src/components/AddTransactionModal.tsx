@@ -1,129 +1,173 @@
-import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { toast } from "sonner";
+'use client'
 
-interface AddTransactionModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Plus } from 'lucide-react'
 
 const categories = [
-  "Food & Dining",
-  "Shopping",
-  "Transportation",
-  "Entertainment",
-  "Bills & Utilities",
-  "Healthcare",
-  "Income",
-  "Other",
-];
+  'Food & Dining',
+  'Shopping',
+  'Transportation',
+  'Entertainment',
+  'Bills & Utilities',
+  'Healthcare',
+  'Education',
+  'Travel',
+  'Income',
+  'Other',
+]
 
-export function AddTransactionModal({ open, onOpenChange }: AddTransactionModalProps) {
-  const [amount, setAmount] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+interface AddTransactionModalProps {
+  onTransactionAdded?: () => void
+}
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+export default function AddTransactionModal({ onTransactionAdded }: AddTransactionModalProps) {
+  const [open, setOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [formData, setFormData] = useState({
+    amount: '',
+    description: '',
+    category: '',
+    type: 'EXPENSE' as 'INCOME' | 'EXPENSE',
+  })
 
-    if (!amount || !description || !category) {
-      toast.error("Please fill in all fields");
-      return;
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+
+    try {
+      // In a real app, you'd call your API here
+      const transaction = {
+        amount: parseFloat(formData.amount),
+        description: formData.description,
+        category: formData.category,
+        type: formData.type,
+        userId: 'mock-user-id', // In a real app, get from auth context
+      }
+
+      // Mock API call
+      await new Promise(resolve => setTimeout(resolve, 1000))
+
+      console.log('Transaction created:', transaction)
+      
+      // Reset form
+      setFormData({
+        amount: '',
+        description: '',
+        category: '',
+        type: 'EXPENSE',
+      })
+      
+      setOpen(false)
+      onTransactionAdded?.()
+    } catch (error) {
+      console.error('Error creating transaction:', error)
+    } finally {
+      setIsLoading(false)
     }
-
-    toast.success("Transaction added successfully");
-    
-    // Reset form
-    setAmount("");
-    setDescription("");
-    setCategory("");
-    setDate(new Date().toISOString().split("T")[0]);
-    onOpenChange(false);
-  };
+  }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] bg-card border-border">
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Plus className="h-4 w-4 mr-2" />
+          Add Transaction
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="bg-gray-900 border-gray-800 text-white">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-semibold">Add Transaction</DialogTitle>
-          <DialogDescription className="text-muted-foreground">
-            Enter the details of your transaction below.
+          <DialogTitle>Add New Transaction</DialogTitle>
+          <DialogDescription className="text-gray-400">
+            Enter the details for your new transaction.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="amount">Amount</Label>
+            <Label htmlFor="type" className="text-white">Type</Label>
+            <Select 
+              value={formData.type} 
+              onValueChange={(value: 'INCOME' | 'EXPENSE') => setFormData({ ...formData, type: value })}
+            >
+              <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="EXPENSE">Expense</SelectItem>
+                <SelectItem value="INCOME">Income</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="amount" className="text-white">Amount</Label>
             <Input
               id="amount"
               type="number"
               step="0.01"
               placeholder="0.00"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="bg-input border-border"
+              value={formData.amount}
+              onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+              required
+              className="bg-gray-800 border-gray-700 text-white"
             />
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description" className="text-white">Description</Label>
             <Input
               id="description"
-              placeholder="e.g., Grocery shopping"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="bg-input border-border"
+              type="text"
+              placeholder="Enter description"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              required
+              className="bg-gray-800 border-gray-700 text-white"
             />
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="category">Category</Label>
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger className="bg-input border-border">
+            <Label htmlFor="category" className="text-white">Category</Label>
+            <Select 
+              value={formData.category} 
+              onValueChange={(value) => setFormData({ ...formData, category: value })}
+            >
+              <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
                 <SelectValue placeholder="Select a category" />
               </SelectTrigger>
-              <SelectContent className="bg-popover border-border">
-                {categories.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {cat}
+              <SelectContent>
+                {categories.map((category) => (
+                  <SelectItem key={category} value={category}>
+                    {category}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="date">Date</Label>
-            <Input
-              id="date"
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="bg-input border-border"
-            />
-          </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+
+          <div className="flex justify-end gap-3 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+              className="border-gray-700 text-gray-300 hover:bg-gray-800"
+            >
               Cancel
             </Button>
-            <Button type="submit">Save Transaction</Button>
-          </DialogFooter>
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              {isLoading ? 'Adding...' : 'Add Transaction'}
+            </Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

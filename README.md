@@ -1,73 +1,145 @@
-# Welcome to your Lovable project
+# FinanceFlow - Budget Assistant
 
-## Project info
+A modern, full-stack budgeting application built with Next.js, Prisma, and PostgreSQL. Track your expenses, manage budgets, and visualize your financial data with beautiful charts.
 
-**URL**: https://lovable.dev/projects/7410a1b6-e376-4454-b6ce-4868f6877a6e
+## Features
 
-## How can I edit this code?
+- 📊 **Dashboard** - Overview of your financial health with balance, spending trends, and recent transactions
+- 💳 **Transactions** - Add, view, and search through all your financial transactions
+- 🎯 **Budgets** - Create and track budgets for different spending categories
+- 📈 **Reports** - Visualize spending patterns with interactive charts
+- 🔐 **Authentication** - Secure user registration and login
+- 🌙 **Dark Theme** - Modern dark UI design
 
-There are several ways of editing your application.
+## Tech Stack
 
-**Use Lovable**
+- **Frontend**: Next.js 15, React 18, TypeScript
+- **Styling**: Tailwind CSS, shadcn/ui components
+- **Backend**: Next.js API routes
+- **Database**: PostgreSQL with Prisma ORM
+- **Charts**: Recharts for data visualization
+- **Authentication**: bcryptjs for password hashing
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/7410a1b6-e376-4454-b6ce-4868f6877a6e) and start prompting.
+## Prerequisites
 
-Changes made via Lovable will be committed automatically to this repo.
+- Node.js 18+ 
+- PostgreSQL database
+- npm or yarn
 
-**Use your preferred IDE**
+## Setup Instructions
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### 1. Clone and Install Dependencies
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+```bash
+cd nimble-fin-assist
+npm install
+```
 
-Follow these steps:
+### 2. Environment Setup
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+Create a `.env` file in the root directory:
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+```env
+# Database
+DATABASE_URL="postgresql://username:password@localhost:5432/nimble_fin_assist?schema=public"
 
-# Step 3: Install the necessary dependencies.
-npm i
+# NextAuth.js (optional)
+NEXTAUTH_SECRET="your-secret-key-here"
+NEXTAUTH_URL="http://localhost:3000"
+```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+### 3. Database Setup
+
+```bash
+# Generate Prisma client
+npm run db:generate
+
+# Push schema to database (for development)
+npm run db:push
+
+# Or run migrations (for production)
+npm run db:migrate
+```
+
+### 4. Start Development Server
+
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The application will be available at `http://localhost:3000`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Available Scripts
 
-**Use GitHub Codespaces**
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+- `npm run db:push` - Push Prisma schema to database
+- `npm run db:migrate` - Run database migrations
+- `npm run db:generate` - Generate Prisma client
+- `npm run db:studio` - Open Prisma Studio
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Project Structure
 
-## What technologies are used for this project?
+```
+├── app/                    # Next.js app directory
+│   ├── api/               # API routes
+│   │   ├── auth/          # Authentication endpoints
+│   │   ├── transactions/  # Transaction endpoints
+│   │   └── budgets/       # Budget endpoints
+│   ├── dashboard/         # Dashboard page
+│   ├── transactions/      # Transactions page
+│   ├── budgets/          # Budgets page
+│   ├── reports/          # Reports page
+│   └── auth/             # Authentication page
+├── src/
+│   ├── components/       # React components
+│   └── lib/             # Utility functions
+├── prisma/
+│   └── schema.prisma    # Database schema
+└── public/              # Static assets
+```
 
-This project is built with:
+## API Endpoints
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Authentication
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User login
 
-## How can I deploy this project?
+### Transactions
+- `GET /api/transactions?userId=xxx` - Get user transactions
+- `POST /api/transactions` - Create new transaction
 
-Simply open [Lovable](https://lovable.dev/projects/7410a1b6-e376-4454-b6ce-4868f6877a6e) and click on Share -> Publish.
+### Budgets
+- `GET /api/budgets?userId=xxx` - Get user budgets
+- `POST /api/budgets` - Create new budget
 
-## Can I connect a custom domain to my Lovable project?
+## Database Schema
 
-Yes, you can!
+The application uses three main models:
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+- **User** - User accounts with authentication
+- **Transaction** - Financial transactions (income/expenses)
+- **Budget** - Budget limits for spending categories
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## Design
+
+The application features a pixel-perfect dark theme design with:
+- Modern card-based layout
+- Interactive charts and visualizations
+- Responsive sidebar navigation
+- Clean typography and spacing
+- Consistent color palette
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## License
+
+MIT License - see LICENSE file for details

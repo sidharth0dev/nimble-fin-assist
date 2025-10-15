@@ -1,17 +1,20 @@
-import { ReactNode } from "react";
-import { AppSidebar } from "./AppSidebar";
+'use client'
+
+import AppSidebar from './AppSidebar'
 
 interface DashboardLayoutProps {
-  children: ReactNode;
+  children: React.ReactNode
 }
 
-export function DashboardLayout({ children }: DashboardLayoutProps) {
+export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
-    <div className="min-h-screen w-full flex">
+    <div className="flex h-screen bg-gray-950">
       <AppSidebar />
-      <main className="flex-1 lg:ml-64 p-4 sm:p-6 lg:p-8">
-        {children}
+      <main className="flex-1 overflow-auto">
+        <div className="p-6">
+          {children}
+        </div>
       </main>
     </div>
-  );
+  )
 }
