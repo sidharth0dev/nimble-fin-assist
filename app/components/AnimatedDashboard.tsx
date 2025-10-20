@@ -5,7 +5,6 @@ import BalanceCard from './BalanceCard'
 import SpendingChart from './SpendingChart'
 import RecentTransactions from './RecentTransactions'
 import AddTransactionModal from './AddTransactionModal'
-import ForecastCard from './ForecastCard'
 import RecurringTransactionModal from './RecurringTransactionModal'
 import { addTransactionAction } from '@/actions/transactions'
 
@@ -107,20 +106,7 @@ export default function AnimatedDashboard({
         </motion.div>
       )}
 
-      {/* Balance Forecast */}
-      {user && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-        >
-          <ForecastCard 
-            userId={user.id}
-            currentBalance={user.balance}
-            currency={user.currency}
-          />
-        </motion.div>
-      )}
+      {/* Balance Forecast temporarily disabled in client to avoid server-only imports */}
 
       {/* Monthly Spending Chart */}
       <motion.div
