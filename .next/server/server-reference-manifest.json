@@ -1,5 +1,24 @@
 {
-  "node": {},
+  "node": {
+    "408aa7738de6e3acb4457cebe501d43030581481f2": {
+      "workers": {
+        "app/dashboard/page": {
+          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2FUsers%2Fsidharthdev%2FDocuments%2Fprojects%2Fnimble-fin-assist%2Fapp%2Factions%2Ftransactions.ts%22%2C%5B%7B%22id%22%3A%22408aa7738de6e3acb4457cebe501d43030581481f2%22%2C%22exportedName%22%3A%22addTransactionAction%22%2C%22filename%22%3A%22app%2Factions%2Ftransactions.ts%22%7D%5D%5D%5D&__client_imported__=true!",
+          "async": false
+        },
+        "app/transactions/page": {
+          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2FUsers%2Fsidharthdev%2FDocuments%2Fprojects%2Fnimble-fin-assist%2Fapp%2Factions%2Ftransactions.ts%22%2C%5B%7B%22id%22%3A%22408aa7738de6e3acb4457cebe501d43030581481f2%22%2C%22exportedName%22%3A%22addTransactionAction%22%2C%22filename%22%3A%22app%2Factions%2Ftransactions.ts%22%7D%5D%5D%5D&__client_imported__=true!",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/dashboard/page": "action-browser",
+        "app/transactions/page": "action-browser"
+      },
+      "filename": "app/actions/transactions.ts",
+      "exportedName": "addTransactionAction"
+    }
+  },
   "edge": {},
-  "encryptionKey": "y2q1uVCl/03r7fW71j/UEhXmbtiC/a49TZWQCaVdI2E="
+  "encryptionKey": "IIgB5pLrK4nINjTpx1+QHuxg88v5Mj8IhOsaN5hRfyc="
 }

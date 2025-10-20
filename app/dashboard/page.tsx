@@ -1,109 +1,172 @@
-'use client'
-
-import { useState, useEffect } from 'react'
+import { prisma } from '@/lib/prisma'
 import DashboardLayout from '@/components/DashboardLayout'
 import BalanceCard from '@/components/BalanceCard'
 import SpendingChart from '@/components/SpendingChart'
 import RecentTransactions from '@/components/RecentTransactions'
 import AddTransactionModal from '@/components/AddTransactionModal'
+import ForecastCard from '@/components/ForecastCard'
+import RecurringTransactionModal from '@/components/RecurringTransactionModal'
+import { addTransactionAction } from '@/actions/transactions'
+import AnimatedDashboard from '@/components/AnimatedDashboard'
 
-// Mock data - in a real app, this would come from your API
-const mockTransactions = [
-  {
-    id: '1',
-    amount: -85.50,
-    description: 'Grocery Store',
-    category: 'Food & Dining',
-    type: 'EXPENSE' as const,
-    date: new Date('2025-10-14'),
-  },
-  {
-    id: '2',
-    amount: 3500.00,
-    description: 'Salary Deposit',
-    category: 'Income',
-    type: 'INCOME' as const,
-    date: new Date('2025-10-13'),
-  },
-  {
-    id: '3',
-    amount: -120.00,
-    description: 'Electric Bill',
-    category: 'Bills & Utilities',
-    type: 'EXPENSE' as const,
-    date: new Date('2025-10-12'),
-  },
-  {
-    id: '4',
-    amount: -12.50,
-    description: 'Coffee Shop',
-    category: 'Food & Dining',
-    type: 'EXPENSE' as const,
-    date: new Date('2025-10-11'),
-  },
-  {
-    id: '5',
-    amount: -45.00,
-    description: 'Gas Station',
-    category: 'Transportation',
-    type: 'EXPENSE' as const,
-    date: new Date('2025-10-10'),
-  },
-]
+interface Transaction {
+  id: string
+  amount: number
+  description: string
+  category: string
+  type: 'INCOME' | 'EXPENSE'
+  date: Date
+}
 
-const mockSpendingData = [
-  { category: 'Food', amount: 450 },
-  { category: 'Shopping', amount: 320 },
-  { category: 'Transport', amount: 180 },
-  { category: 'Entertainment', amount: 220 },
-  { category: 'Bills', amount: 670 },
-]
+interface User {
+  id: string
+  name: string
+  email: string
+  balance: number
+  currency: string
+}
 
-export default function DashboardPage() {
-  const [transactions, setTransactions] = useState(mockTransactions)
-  const [spendingData, setSpendingData] = useState(mockSpendingData)
+interface RecurringTransaction {
+  id: string
+  amount: number
+  description: string
+  category: string
+  type: 'INCOME' | 'EXPENSE'
+  frequency: 'WEEKLY' | 'MONTHLY'
+  startDate: string
+  endDate?: string
+  isActive: boolean
+}
 
-  // Calculate current balance
-  const currentBalance = transactions.reduce((sum, transaction) => {
-    return sum + transaction.amount
-  }, 8450) // Starting balance
+// Server-side data fetching function with diagnostic logging
+async function getDashboardData(): Promise<{ user: User | null; transactions: Transaction[]; recurringTransactions: RecurringTransaction[] }> {
+  try {
+    console.log('🔍 DASHBOARD: Starting data fetch from database...')
+    
+    // Use test user ID for now (you can modify this to use authentication later)
+    const userId = 'user-1'
+    
+    // Fetch user data directly from database
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        balance: true,
+        currency: true
+      }
+    })
+    
+    // CRITICAL DIAGNOSTIC LOG: What the dashboard actually reads from database
+    console.log('DASHBOARD READS BALANCE:', user?.balance, 'Timestamp:', new Date().getTime())
+    console.log('DASHBOARD READS USER DATA:', {
+      id: user?.id,
+      name: user?.name,
+      email: user?.email,
+      balance: user?.balance,
+      currency: user?.currency
+    })
+    
+    // Fetch transactions directly from database
+    const transactions = await prisma.transaction.findMany({
+      where: { userId },
+      orderBy: { date: 'desc' },
+      select: {
+        id: true,
+        amount: true,
+        description: true,
+        category: true,
+        type: true,
+        date: true
+      }
+    })
+    
+    // Convert Decimal amounts to numbers and dates to Date objects
+    const processedTransactions: Transaction[] = transactions.map(t => ({
+      ...t,
+      amount: Number(t.amount),
+      date: new Date(t.date)
+    }))
+    
+    console.log('DASHBOARD READS TRANSACTIONS COUNT:', processedTransactions.length)
+    
+    // Fetch recurring transactions
+    const recurringTransactions = await prisma.recurringTransaction.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        amount: true,
+        description: true,
+        category: true,
+        type: true,
+        frequency: true,
+        startDate: true,
+        endDate: true,
+        isActive: true
+      }
+    })
+    
+    // Convert Decimal amounts to numbers and dates to strings
+    const processedRecurringTransactions: RecurringTransaction[] = recurringTransactions.map(rt => ({
+      ...rt,
+      amount: Number(rt.amount),
+      startDate: rt.startDate.toISOString(),
+      endDate: rt.endDate ? rt.endDate.toISOString() : undefined
+    }))
+    
+    console.log('DASHBOARD READS RECURRING TRANSACTIONS COUNT:', processedRecurringTransactions.length)
+    
+    return {
+      user: user ? {
+        id: user.id,
+        name: user.name || 'User',
+        email: user.email,
+        balance: user.balance,
+        currency: user.currency
+      } : null,
+      transactions: processedTransactions,
+      recurringTransactions: processedRecurringTransactions
+    }
+  } catch (error) {
+    console.error('❌ DASHBOARD: Error fetching data from database:', error)
+    return { user: null, transactions: [], recurringTransactions: [] }
+  }
+}
 
-  // Calculate change from last month (mock data)
-  const lastMonthBalance = 8030
-  const balanceChange = currentBalance - lastMonthBalance
-  const balanceChangePercent = ((balanceChange / lastMonthBalance) * 100).toFixed(1)
+export default async function DashboardPage() {
+  // Fetch data directly from database (Server Component)
+  const { user, transactions, recurringTransactions } = await getDashboardData()
+  
+  // Calculate spending data by category
+  const spendingData = transactions
+    .filter(t => t.type === 'EXPENSE')
+    .reduce((acc, transaction) => {
+      const existing = acc.find(item => item.category === transaction.category)
+      if (existing) {
+        existing.amount += Math.abs(transaction.amount)
+      } else {
+        acc.push({ category: transaction.category, amount: Math.abs(transaction.amount) })
+      }
+      return acc
+    }, [] as { category: string; amount: number }[])
+
+  // Calculate change from last month (mock data for now)
+  const lastMonthBalance = user ? user.balance * 0.95 : 0 // Simulate 5% change
+  const balanceChange = user ? user.balance - lastMonthBalance : 0
+  const balanceChangePercent = lastMonthBalance > 0 ? ((balanceChange / lastMonthBalance) * 100) : 0
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-            <p className="text-gray-400">Welcome back! Here's your financial overview.</p>
-          </div>
-          <AddTransactionModal />
-        </div>
-
-        {/* Current Balance Card */}
-        <BalanceCard 
-          balance={currentBalance}
-          change={balanceChange}
-          changePercent={parseFloat(balanceChangePercent)}
-        />
-
-        {/* Monthly Spending Chart */}
-        <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
-          <h2 className="text-xl font-semibold text-white mb-4">Monthly Spending by Category</h2>
-          <SpendingChart data={spendingData} />
-        </div>
-
-        {/* Recent Transactions */}
-        <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
-          <h2 className="text-xl font-semibold text-white mb-4">Recent Transactions</h2>
-          <RecentTransactions transactions={transactions.slice(0, 5)} />
-        </div>
-      </div>
+      <AnimatedDashboard
+        user={user}
+        transactions={transactions}
+        recurringTransactions={recurringTransactions}
+        spendingData={spendingData}
+        balanceChange={balanceChange}
+        balanceChangePercent={balanceChangePercent}
+      />
     </DashboardLayout>
   )
 }

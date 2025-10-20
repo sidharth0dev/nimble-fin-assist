@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE "budgets" ALTER COLUMN "limit" SET DATA TYPE DECIMAL(15,2),
+ALTER COLUMN "spent" SET DATA TYPE DECIMAL(15,2);
+
+-- AlterTable
+ALTER TABLE "transactions" ALTER COLUMN "amount" SET DATA TYPE DECIMAL(15,2);

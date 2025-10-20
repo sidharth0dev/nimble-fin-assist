@@ -8,6 +8,7 @@ A modern, full-stack budgeting application built with Next.js, Prisma, and Postg
 - 💳 **Transactions** - Add, view, and search through all your financial transactions
 - 🎯 **Budgets** - Create and track budgets for different spending categories
 - 📈 **Reports** - Visualize spending patterns with interactive charts
+- 🔮 **Scheduled Forecasting** - Define recurring transactions and see 6-month balance projections
 - 🔐 **Authentication** - Secure user registration and login
 - 🌙 **Dark Theme** - Modern dark UI design
 
@@ -111,17 +112,39 @@ The application will be available at `http://localhost:3000`
 - `GET /api/transactions?userId=xxx` - Get user transactions
 - `POST /api/transactions` - Create new transaction
 
+### Recurring Transactions
+- `GET /api/recurring-transactions` - Get user recurring transactions
+- `POST /api/recurring-transactions` - Create new recurring transaction
+- `PUT /api/recurring-transactions/[id]` - Update recurring transaction
+- `DELETE /api/recurring-transactions/[id]` - Delete recurring transaction
+
 ### Budgets
 - `GET /api/budgets?userId=xxx` - Get user budgets
 - `POST /api/budgets` - Create new budget
 
 ## Database Schema
 
-The application uses three main models:
+The application uses four main models:
 
 - **User** - User accounts with authentication
 - **Transaction** - Financial transactions (income/expenses)
+- **RecurringTransaction** - Scheduled recurring transactions for forecasting
 - **Budget** - Budget limits for spending categories
+
+### Scheduled Forecasting Feature
+
+The new **Scheduled Forecasting** feature allows users to:
+
+1. **Define Recurring Transactions**: Set up monthly or weekly recurring income/expenses (e.g., salary, rent, subscriptions)
+2. **Balance Projections**: View 6-month balance forecasts combining actual transactions with scheduled recurring ones
+3. **Temporal Data Management**: Complex server-side calculations that project future account balances
+4. **Interactive Dashboard**: New ForecastCard component showing monthly projections with visual indicators
+
+**Technical Implementation:**
+- New `RecurringTransaction` model with frequency, start/end dates, and active status
+- Server-side `ForecastCard` component with complex balance projection algorithms
+- Full CRUD API for managing recurring transactions
+- Integration with existing dashboard and transaction systems
 
 ## Design
 

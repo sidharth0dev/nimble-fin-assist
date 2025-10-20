@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -8,38 +8,8 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Progress } from '@/components/ui/progress'
 import { Plus } from 'lucide-react'
-
-// Mock data - in a real app, this would come from your API
-const mockBudgets = [
-  {
-    id: '1',
-    category: 'Food & Dining',
-    limit: 600,
-    spent: 450,
-    period: 'MONTHLY' as const,
-  },
-  {
-    id: '2',
-    category: 'Shopping',
-    limit: 400,
-    spent: 320,
-    period: 'MONTHLY' as const,
-  },
-  {
-    id: '3',
-    category: 'Transportation',
-    limit: 200,
-    spent: 180,
-    period: 'MONTHLY' as const,
-  },
-  {
-    id: '4',
-    category: 'Bills & Utilities',
-    limit: 700,
-    spent: 680,
-    period: 'MONTHLY' as const,
-  },
-]
+import { useCurrency } from '@/hooks/useCurrency'
+import { formatCurrency } from '@/lib/currency'
 
 const categories = [
   'Food & Dining',
@@ -53,34 +23,84 @@ const categories = [
   'Other',
 ]
 
+interface Budget {
+  id: string
+  category: string
+  limit: number
+  spent: number
+  period: 'MONTHLY' | 'YEARLY'
+}
+
 export default function BudgetsPage() {
-  const [budgets, setBudgets] = useState(mockBudgets)
+  const { currency } = useCurrency()
+  const [budgets, setBudgets] = useState<Budget[]>([])
+  const [loading, setLoading] = useState(true)
   const [newBudget, setNewBudget] = useState({
     category: '',
     limit: '',
   })
 
-  const handleCreateBudget = () => {
+  // Ensure test user exists and fetch budgets from API
+  const fetchBudgets = async () => {
+    try {
+      // For now, using a hardcoded userId - in a real app, this would come from auth
+      const userId = 'user-1' // This should be replaced with actual user ID from auth
+      
+      // First, ensure test user exists
+      await fetch('/api/test-user', { method: 'POST' })
+      
+      const response = await fetch(`/api/budgets?userId=${userId}`)
+      if (response.ok) {
+        const data = await response.json()
+        setBudgets(data.budgets || [])
+      }
+    } catch (error) {
+      console.error('Error fetching budgets:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchBudgets()
+  }, [])
+
+  const handleCreateBudget = async () => {
     if (!newBudget.category || !newBudget.limit) return
 
-    const budget = {
-      id: Date.now().toString(),
-      category: newBudget.category,
-      limit: parseFloat(newBudget.limit),
-      spent: 0,
-      period: 'MONTHLY' as const,
+    try {
+      const userId = 'user-1' // This should be replaced with actual user ID from auth
+      
+      // Ensure test user exists before creating budget
+      await fetch('/api/test-user', { method: 'POST' })
+      
+      const response = await fetch('/api/budgets', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          category: newBudget.category,
+          limit: parseFloat(newBudget.limit),
+          period: 'MONTHLY',
+          userId,
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setBudgets([...budgets, data.budget])
+        setNewBudget({ category: '', limit: '' })
+      } else {
+        const error = await response.json()
+        alert(error.error || 'Failed to create budget')
+      }
+    } catch (error) {
+      console.error('Error creating budget:', error)
+      alert('Failed to create budget')
     }
-
-    setBudgets([...budgets, budget])
-    setNewBudget({ category: '', limit: '' })
   }
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount)
-  }
 
   const getRemainingAmount = (limit: number, spent: number) => {
     return Math.max(0, limit - spent)
@@ -143,8 +163,13 @@ export default function BudgetsPage() {
         {/* Active Budgets */}
         <div>
           <h2 className="text-xl font-semibold text-white mb-4">Active Budgets</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {budgets.map((budget) => {
+          {loading ? (
+            <div className="text-gray-400">Loading budgets...</div>
+          ) : budgets.length === 0 ? (
+            <div className="text-gray-400">No budgets created yet.</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {budgets.map((budget) => {
               const remaining = getRemainingAmount(budget.limit, budget.spent)
               const percentage = getSpentPercentage(budget.limit, budget.spent)
 
@@ -158,20 +183,23 @@ export default function BudgetsPage() {
                   <div className="mb-3">
                     <div className="flex items-center justify-between text-sm mb-1">
                       <span className="text-gray-300">
-                        {formatCurrency(budget.spent)} of {formatCurrency(budget.limit)}
+                        {formatCurrency(budget.spent, currency)} of {formatCurrency(budget.limit, currency)}
                       </span>
                       <span className="text-green-500 font-medium">
-                        {formatCurrency(remaining)} remaining
+                        {formatCurrency(remaining, currency)} remaining
                       </span>
                     </div>
                     <Progress value={percentage} className="h-2" />
                   </div>
                 </div>
               )
-            })}
-          </div>
+              })}
+            </div>
+          )}
         </div>
       </div>
     </DashboardLayout>
   )
 }
+
+

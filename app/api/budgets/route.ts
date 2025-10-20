@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
+import { Decimal } from '@prisma/client/runtime/library'
 
 const budgetSchema = z.object({
   category: z.string().min(1, 'Category is required'),
@@ -41,7 +43,23 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
+    console.log('Received budget data:', body)
+    
     const validatedData = budgetSchema.parse(body)
+    console.log('Validated data:', validatedData)
+
+    // Check if user exists
+    const user = await prisma.user.findUnique({
+      where: { id: validatedData.userId }
+    })
+
+    if (!user) {
+      console.error('User not found:', validatedData.userId)
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      )
+    }
 
     // Check if budget already exists for this category and user
     const existingBudget = await prisma.budget.findFirst({
@@ -59,14 +77,21 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Convert limit to Decimal for Prisma
     const budget = await prisma.budget.create({
       data: {
         category: validatedData.category,
-        limit: validatedData.limit,
+        limit: new Decimal(validatedData.limit),
         period: validatedData.period,
         userId: validatedData.userId,
       },
     })
+
+    console.log('Budget created successfully:', budget)
+
+    // Revalidate cache for relevant pages
+    revalidatePath('/budgets')
+    revalidatePath('/dashboard')
 
     return NextResponse.json(
       { 
@@ -77,6 +102,7 @@ export async function POST(request: NextRequest) {
     )
   } catch (error) {
     if (error instanceof z.ZodError) {
+      console.error('Validation error:', error.errors)
       return NextResponse.json(
         { error: 'Validation error', details: error.errors },
         { status: 400 }
@@ -85,8 +111,10 @@ export async function POST(request: NextRequest) {
 
     console.error('Error creating budget:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
   }
 }
+
+
