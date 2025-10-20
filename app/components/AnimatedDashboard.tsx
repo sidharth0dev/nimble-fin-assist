@@ -1,11 +1,13 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useIsMobile } from '@/hooks/use-mobile'
 import BalanceCard from './BalanceCard'
 import SpendingChart from './SpendingChart'
 import RecentTransactions from './RecentTransactions'
 import AddTransactionModal from './AddTransactionModal'
 import RecurringTransactionModal from './RecurringTransactionModal'
+import FinancialVisualizer, { StaticFinancialVisualizer } from './FinancialVisualizer'
 import { addTransactionAction } from '@/actions/transactions'
 
 interface Transaction {
@@ -54,6 +56,7 @@ export default function AnimatedDashboard({
   balanceChange,
   balanceChangePercent
 }: AnimatedDashboardProps) {
+  const isMobile = useIsMobile()
   return (
     <div className="space-y-6 max-w-full">
       {/* Header */}
@@ -84,26 +87,26 @@ export default function AnimatedDashboard({
         </motion.div>
       </motion.div>
 
-      {/* Grid: mobile 1-col, md 2-col, lg 3-col */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {/* Current Balance Card */}
-      {!user ? (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="bg-gray-900 rounded-lg p-6 border border-gray-800 w-full"
-        >
-          <div className="text-center py-8">
-            <p className="text-gray-400">User not found. Please check your authentication.</p>
-          </div>
-        </motion.div>
-      ) : (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-            className="w-full"
+      {/* Main Content Grid - Prioritizing key components */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+        {/* Current Balance Card - Prominent position */}
+        {!user ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="bg-gray-900 rounded-lg p-6 border border-gray-800 w-full lg:col-span-4"
+          >
+            <div className="text-center py-8">
+              <p className="text-gray-400">User not found. Please check your authentication.</p>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="w-full lg:col-span-4"
           >
             <BalanceCard 
               balance={user.balance}
@@ -111,27 +114,69 @@ export default function AnimatedDashboard({
               changePercent={balanceChangePercent}
             />
           </motion.div>
-      )}
-        {/* Monthly Spending Chart */}
+        )}
+
+        {/* Monthly Spending Chart - Large and prominent */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          className="bg-gray-900 rounded-lg p-6 border border-gray-800 hover:border-gray-700 transition-colors duration-300 w-full lg:col-span-8"
+        >
+          <h2 className="text-2xl font-bold text-white mb-6">Monthly Spending by Category</h2>
+          <SpendingChart data={spendingData} />
+        </motion.div>
+
+        {/* Recent Transactions - Full width for better visibility */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.8 }}
-          className="bg-gray-900 rounded-lg p-6 border border-gray-800 hover:border-gray-700 transition-colors duration-300 w-full lg:col-span-2"
+          className="bg-gray-900 rounded-lg p-6 border border-gray-800 hover:border-gray-700 transition-colors duration-300 w-full lg:col-span-12"
         >
-          <h2 className="text-xl font-semibold text-white mb-4">Monthly Spending by Category</h2>
-          <SpendingChart data={spendingData} />
+          <h2 className="text-2xl font-bold text-white mb-6">Recent Transactions</h2>
+          <RecentTransactions transactions={transactions.slice(0, 8)} />
         </motion.div>
+      </div>
 
-        {/* Recent Transactions */}
+      {/* Secondary Visualizers - Smaller and less prominent */}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2 mt-6">
+        {/* Financial Flow Visualizer */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 1.0 }}
-          className="bg-gray-900 rounded-lg p-6 border border-gray-800 hover:border-gray-700 transition-colors duration-300 w-full"
+          className="bg-gray-900/50 rounded-lg border border-gray-800/50 hover:border-gray-700/50 transition-colors duration-300 w-full h-48"
         >
-          <h2 className="text-xl font-semibold text-white mb-4">Recent Transactions</h2>
-          <RecentTransactions transactions={transactions.slice(0, 5)} />
+          <div className="p-4 h-full">
+            <h3 className="text-sm font-medium text-gray-300 mb-2">Financial Flow</h3>
+            <div className="h-full">
+              {isMobile ? (
+                <StaticFinancialVisualizer variant="flowing-lines" className="h-full" />
+              ) : (
+                <FinancialVisualizer variant="flowing-lines" className="h-full" />
+              )}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Growth Particles Visualizer */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 1.2 }}
+          className="bg-gray-900/50 rounded-lg border border-gray-800/50 hover:border-gray-700/50 transition-colors duration-300 w-full h-48"
+        >
+          <div className="p-4 h-full">
+            <h3 className="text-sm font-medium text-gray-300 mb-2">Growth Indicators</h3>
+            <div className="h-full">
+              {isMobile ? (
+                <StaticFinancialVisualizer variant="particles" className="h-full" />
+              ) : (
+                <FinancialVisualizer variant="particles" className="h-full" />
+              )}
+            </div>
+          </div>
         </motion.div>
       </div>
     </div>

@@ -21,16 +21,6 @@
       "static/chunks/main-app.js",
       "static/chunks/app/api/user/balance/route.js"
     ],
-    "/api/transactions/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/transactions/route.js"
-    ],
-    "/api/recurring-transactions/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/recurring-transactions/route.js"
-    ],
     "/api/settings/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -45,6 +35,16 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/api/test-user/route.js"
+    ],
+    "/api/transactions/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/transactions/route.js"
+    ],
+    "/api/recurring-transactions/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/recurring-transactions/route.js"
     ],
     "/budgets/page": [
       "static/chunks/webpack.js",
