@@ -55,13 +55,13 @@ export default function AnimatedDashboard({
   balanceChangePercent
 }: AnimatedDashboardProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-full">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="flex items-center justify-between"
+        className="flex items-center justify-between gap-4 flex-wrap"
       >
         <div>
           <h1 className="text-3xl font-bold text-white">Dashboard</h1>
@@ -71,7 +71,7 @@ export default function AnimatedDashboard({
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="flex gap-2"
+          className="flex gap-2 w-full sm:w-auto justify-end"
         >
           <RecurringTransactionModal 
             recurringTransactions={recurringTransactions}
@@ -80,13 +80,15 @@ export default function AnimatedDashboard({
         </motion.div>
       </motion.div>
 
-      {/* Current Balance Card */}
+      {/* Grid: mobile 1-col, md 2-col, lg 3-col */}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {/* Current Balance Card */}
       {!user ? (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="bg-gray-900 rounded-lg p-6 border border-gray-800"
+          className="bg-gray-900 rounded-lg p-6 border border-gray-800 w-full"
         >
           <div className="text-center py-8">
             <p className="text-gray-400">User not found. Please check your authentication.</p>
@@ -97,38 +99,37 @@ export default function AnimatedDashboard({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
-        >
-          <BalanceCard 
-            balance={user.balance}
-            change={balanceChange}
-            changePercent={balanceChangePercent}
-          />
-        </motion.div>
+            className="w-full"
+          >
+            <BalanceCard 
+              balance={user.balance}
+              change={balanceChange}
+              changePercent={balanceChangePercent}
+            />
+          </motion.div>
       )}
+        {/* Monthly Spending Chart */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+          className="bg-gray-900 rounded-lg p-6 border border-gray-800 hover:border-gray-700 transition-colors duration-300 w-full lg:col-span-2"
+        >
+          <h2 className="text-xl font-semibold text-white mb-4">Monthly Spending by Category</h2>
+          <SpendingChart data={spendingData} />
+        </motion.div>
 
-      {/* Balance Forecast temporarily disabled in client to avoid server-only imports */}
-
-      {/* Monthly Spending Chart */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.8 }}
-        className="bg-gray-900 rounded-lg p-6 border border-gray-800 hover:border-gray-700 transition-colors duration-300"
-      >
-        <h2 className="text-xl font-semibold text-white mb-4">Monthly Spending by Category</h2>
-        <SpendingChart data={spendingData} />
-      </motion.div>
-
-      {/* Recent Transactions */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 1.0 }}
-        className="bg-gray-900 rounded-lg p-6 border border-gray-800 hover:border-gray-700 transition-colors duration-300"
-      >
-        <h2 className="text-xl font-semibold text-white mb-4">Recent Transactions</h2>
-        <RecentTransactions transactions={transactions.slice(0, 5)} />
-      </motion.div>
+        {/* Recent Transactions */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 1.0 }}
+          className="bg-gray-900 rounded-lg p-6 border border-gray-800 hover:border-gray-700 transition-colors duration-300 w-full"
+        >
+          <h2 className="text-xl font-semibold text-white mb-4">Recent Transactions</h2>
+          <RecentTransactions transactions={transactions.slice(0, 5)} />
+        </motion.div>
+      </div>
     </div>
   )
 }

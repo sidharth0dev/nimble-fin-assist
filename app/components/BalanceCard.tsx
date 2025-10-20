@@ -16,7 +16,7 @@ export default function BalanceCard({ balance, change, changePercent }: BalanceC
   const isPositive = change >= 0
 
   return (
-    <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
+    <div className="bg-gray-900 rounded-lg p-6 border border-gray-800 w-full">
       <h2 className="text-lg font-medium text-gray-300 mb-4">Current Balance</h2>
       
       <div className="flex items-center justify-between">
