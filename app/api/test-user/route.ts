@@ -47,3 +47,42 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+
+// GET - Check if test user exists (useful for frontend checks)
+export async function GET() {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: 'user-1' },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        currency: true,
+        balance: true,
+        createdAt: true
+      }
+    })
+
+    if (!user) {
+      return NextResponse.json(
+        { message: 'Test user not found', exists: false },
+        { status: 404 }
+      )
+    }
+
+    return NextResponse.json(
+      { 
+        message: 'Test user found',
+        exists: true,
+        user: user
+      },
+      { status: 200 }
+    )
+  } catch (error) {
+    console.error('Error checking test user:', error)
+    return NextResponse.json(
+      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    )
+  }
+}
