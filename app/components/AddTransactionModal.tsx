@@ -60,7 +60,7 @@ export default function AddTransactionModal({ action }: AddTransactionModalProps
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+        <Button className="bg-blue-600 hover:bg-blue-700 text-white px-4">
           <Plus className="h-4 w-4 mr-2" />
           Add Transaction
         </Button>

@@ -99,10 +99,35 @@ export default {
             height: "0",
           },
         },
+        // Subtle fade-in for numbers/cards
+        "fade-in": {
+          from: { opacity: "0", transform: "translateY(4px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        // Very gentle pulse for emphasis without distraction
+        "subtle-pulse": {
+          "0%": { opacity: "0.92" },
+          "50%": { opacity: "1" },
+          "100%": { opacity: "0.92" },
+        },
+        // Flowing horizontal line movement
+        "flow-x": {
+          from: { transform: "translateX(-20%)" },
+          to: { transform: "translateX(120%)" },
+        },
+        // Floating particle upward drift
+        "float-up": {
+          from: { transform: "translateY(8px)", opacity: "0" },
+          to: { transform: "translateY(-8px)", opacity: "0.6" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in": "fade-in 300ms ease-out",
+        "subtle-pulse": "subtle-pulse 2.4s ease-in-out infinite",
+        "flow-x": "flow-x 6s linear infinite",
+        "float-up": "float-up 3.5s ease-in-out infinite alternate",
       },
     },
   },

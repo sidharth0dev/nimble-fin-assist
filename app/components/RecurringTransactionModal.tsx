@@ -147,7 +147,7 @@ export default function RecurringTransactionModal({
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button className="flex items-center gap-2">
+        <Button className="flex items-center gap-2 px-4">
           <Plus className="h-4 w-4" />
           Manage Recurring Transactions
         </Button>

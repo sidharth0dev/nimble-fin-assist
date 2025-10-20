@@ -40,25 +40,29 @@ export default function RecentTransactions({ transactions }: RecentTransactionsP
         return (
           <div
             key={transaction.id}
-            className="flex items-center justify-between p-4 bg-gray-800 rounded-lg border border-gray-700"
+            className="p-4 bg-gray-800 rounded-lg border border-gray-700"
           >
-            <div className="flex items-center gap-3">
-              <div className={`h-10 w-10 rounded-full ${iconColor} flex items-center justify-center`}>
-                {isIncome ? (
-                  <ArrowDownLeft className="h-5 w-5 text-white" />
-                ) : (
-                  <ArrowUpRight className="h-5 w-5 text-white" />
-                )}
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className={`h-10 w-10 rounded-full ${iconColor} flex items-center justify-center`}>
+                  {isIncome ? (
+                    <ArrowDownLeft className="h-5 w-5 text-white" />
+                  ) : (
+                    <ArrowUpRight className="h-5 w-5 text-white" />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <h3 className="font-medium text-white truncate">{transaction.description}</h3>
+                  <p className="text-sm text-gray-400">
+                    <span className="mr-2">{transaction.category}</span>
+                    <span className="text-gray-500">•</span>
+                    <span className="ml-2">{format(transaction.date, 'MMM d, yyyy')}</span>
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-medium text-white">{transaction.description}</h3>
-                <p className="text-sm text-gray-400">
-                  {transaction.category} • {format(transaction.date, 'MMM d, yyyy')}
-                </p>
+              <div className={`font-semibold ${amountColor} shrink-0 text-right`}>
+                {amountPrefix}{formatCurrency(Math.abs(transaction.amount), currency)}
               </div>
-            </div>
-            <div className={`font-semibold ${amountColor}`}>
-              {amountPrefix}{formatCurrency(Math.abs(transaction.amount), currency)}
             </div>
           </div>
         )

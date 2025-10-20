@@ -189,9 +189,9 @@ export default function TransactionsPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="mx-auto max-w-6xl space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
           <div>
             <h1 className="text-3xl font-bold text-white">Transactions</h1>
             <p className="text-gray-400">View and manage all your transactions.</p>
@@ -200,7 +200,7 @@ export default function TransactionsPage() {
         </div>
 
         {/* Search and Filter Bar */}
-        <div className="flex gap-4">
+        <div className="flex gap-4 flex-col sm:flex-row">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
@@ -522,9 +522,9 @@ export default function TransactionsPage() {
             return (
               <div
                 key={transaction.id}
-                className="flex items-center justify-between p-4 bg-gray-900 rounded-lg border border-gray-800"
+                className="rounded-xl border border-gray-800 bg-gray-900/90 shadow transition-all hover:shadow-lg"
               >
-                <div className="flex items-center gap-3">
+                <div className="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-[auto,1fr,auto] items-center gap-4">
                   <div className={`h-10 w-10 rounded-full ${iconColor} flex items-center justify-center`}>
                     {isIncome ? (
                       <ArrowDownLeft className="h-5 w-5 text-white" />
@@ -532,15 +532,15 @@ export default function TransactionsPage() {
                       <ArrowUpRight className="h-5 w-5 text-white" />
                     )}
                   </div>
-                  <div>
-                    <h3 className="font-medium text-white">{transaction.description}</h3>
-                    <p className="text-sm text-gray-400">
+                  <div className="min-w-0">
+                    <h3 className="font-medium text-white truncate">{transaction.description}</h3>
+                    <p className="text-sm text-gray-400 truncate">
                       {transaction.category} • {format(transaction.date, 'MMM d, yyyy')}
                     </p>
                   </div>
-                </div>
-                <div className={`font-semibold ${amountColor}`}>
-                  {amountPrefix}{formatCurrency(transaction.amount)}
+                  <div className={`font-semibold ${amountColor} sm:text-right`}>
+                    {amountPrefix}{formatCurrency(transaction.amount)}
+                  </div>
                 </div>
               </div>
             )

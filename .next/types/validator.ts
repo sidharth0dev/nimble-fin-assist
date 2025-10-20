@@ -155,6 +155,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../app/api/migrate/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/migrate">> = Specific
+  const handler = {} as typeof import("../../app/api/migrate/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../app/api/recurring-transactions/[id]/route.ts
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/recurring-transactions/[id]">> = Specific

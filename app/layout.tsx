@@ -21,7 +21,9 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={inter.className}>
         <TooltipProvider>
-          {children}
+          <div className="min-h-screen bg-gray-950 text-gray-100 antialiased transition-all duration-300">
+            {children}
+          </div>
           <Toaster />
           <Sonner />
         </TooltipProvider>

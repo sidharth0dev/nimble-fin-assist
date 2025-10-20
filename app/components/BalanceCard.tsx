@@ -16,18 +16,19 @@ export default function BalanceCard({ balance, change, changePercent }: BalanceC
   const isPositive = change >= 0
 
   return (
-    <div className="bg-gray-900 rounded-lg p-6 border border-gray-800 w-full">
-      <h2 className="text-lg font-medium text-gray-300 mb-4">Current Balance</h2>
-      
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="text-3xl font-bold text-white mb-2">
+    <div className="w-full rounded-xl border border-gray-800 bg-gray-900/90 shadow-xl">
+      <div className="p-4 sm:p-5">
+        <div className="flex items-center justify-between">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-200">Current Balance</h2>
+        </div>
+        <div className="mt-4 flex flex-col items-center text-center">
+          <div className="text-4xl sm:text-5xl font-extrabold text-teal-400 mb-2 animate-fade-in">
             {formatCurrency(balance, currency)}
           </div>
           <div className="flex items-center gap-2">
-            <TrendingUp className={`h-4 w-4 ${isPositive ? 'text-green-500' : 'text-red-500'}`} />
-            <span className={`text-sm font-medium ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
-              {isPositive ? '+' : ''}{changePercent}%
+            <TrendingUp className={`h-4 w-4 ${isPositive ? 'text-teal-400' : 'text-red-400'}`} />
+            <span className={`text-sm font-semibold ${isPositive ? 'text-teal-400' : 'text-red-400'}`}>
+              {isPositive ? '+' : ''}{Number(changePercent).toFixed(2)}%
             </span>
           </div>
           <p className="text-sm text-gray-400 mt-1">

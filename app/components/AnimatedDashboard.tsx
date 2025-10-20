@@ -73,10 +73,14 @@ export default function AnimatedDashboard({
           transition={{ duration: 0.6, delay: 0.2 }}
           className="flex gap-2 w-full sm:w-auto justify-end"
         >
-          <RecurringTransactionModal 
-            recurringTransactions={recurringTransactions}
-          />
-          <AddTransactionModal action={addTransactionAction} />
+          <div className="flex gap-2">
+            <RecurringTransactionModal 
+              recurringTransactions={recurringTransactions}
+            />
+            <div className="[&>button]:px-4">
+              <AddTransactionModal action={addTransactionAction} />
+            </div>
+          </div>
         </motion.div>
       </motion.div>
 
